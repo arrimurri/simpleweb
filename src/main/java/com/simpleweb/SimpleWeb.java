@@ -1,8 +1,8 @@
 package com.simpleweb;
 
 import com.simpleweb.route.Route;
+import com.simpleweb.templatehandlers.TemplateHandler;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,30 +11,17 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class SimpleWeb extends HttpServlet {
-
-    private ConcurrentLinkedQueue<Route> routes = new ConcurrentLinkedQueue<>();
+public abstract class SimpleWeb extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (!routes.isEmpty()) {
-            for (Route route : routes) {
-                if (route.matches(req.getRequestURI())) {
-                    RequestDispatcher dispatcher = req.getRequestDispatcher(route.getTarget());
-                    dispatcher.forward(req, resp);
-                }
-            }
-        }
+        getTemplateHandler().findAndDispatch(getRoutes(), req, resp);
 
     }
 
-    public void addRoute(Route route) {
-        this.routes.add(route);
-    }
+    public abstract ConcurrentLinkedQueue<Route> getRoutes();
 
-    public ConcurrentLinkedQueue<Route> getRoutes() {
-        return routes;
-    }
+    public abstract TemplateHandler getTemplateHandler();
 
 }
